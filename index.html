@@ -302,6 +302,10 @@
         function setupEventListeners() {
             // Shift + Tab 등록
             dom.textarea.addEventListener('keydown', (e) => {
+
+                if (e.isComposing) return;
+
+                
                 if (e.key === 'Tab' && e.shiftKey) {
                     e.preventDefault(); // 기본 탭 이동 방지
                     addMemo();
