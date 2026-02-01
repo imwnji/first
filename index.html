@@ -30,10 +30,10 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow-y: scroll; /* 항상 스크롤바 표시 (UI 흔들림 방지) */
+            overflow-y: scroll; /* 항상 스크롤바 표시 */
         }
 
-        /* 상단 필터 컨트롤 (심플하게) */
+        /* 상단 필터 컨트롤 */
         header {
             position: fixed;
             top: 0;
@@ -46,6 +46,7 @@
             gap: 20px;
             z-index: 100;
             font-size: 14px;
+            box-sizing: border-box;
         }
 
         .filter-group {
@@ -54,7 +55,7 @@
             gap: 10px;
         }
 
-        select, button {
+        select {
             font-family: var(--font-main);
             padding: 5px;
             cursor: pointer;
@@ -69,13 +70,16 @@
             padding-top: 80px; /* 헤더 높이만큼 여백 */
             padding-bottom: 100px;
             width: 100%;
-            max-width: 600px;
+            max-width: 800px; /* 너비 약간 증가 */
             margin: 0 auto;
             min-height: 80vh;
             transition: justify-content 0.3s;
+            box-sizing: border-box;
+            padding-left: 20px;
+            padding-right: 20px;
         }
 
-        /* 시작 화면일 때 중앙 정렬을 위한 클래스 */
+        /* 시작 화면일 때 중앙 정렬 */
         #app-container.empty {
             justify-content: center;
             padding-top: 0;
@@ -97,8 +101,7 @@
             padding: 20px;
             box-sizing: border-box;
             background-color: var(--color-white);
-            margin-bottom: 0; /* 연결선 때문에 마진 제거 */
-            position: relative;
+            margin-bottom: 0;
             box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
         }
 
@@ -112,11 +115,11 @@
         .memo-content {
             font-size: 16px;
             line-height: 1.5;
-            white-space: pre-wrap; /* 줄바꿈 보존 */
+            white-space: pre-wrap;
             word-break: break-all;
         }
 
-        /* 연결선 (타임라인 효과) */
+        /* 연결선 */
         .connector {
             width: 1px;
             height: 30px;
@@ -124,7 +127,7 @@
             margin: 0 auto;
         }
 
-        /* 입력 폼 영역 */
+        /* 입력 폼 영역 전체 */
         #input-area {
             width: 100%;
             display: flex;
@@ -134,10 +137,19 @@
             transition: opacity 0.3s;
         }
 
-        /* 입력창 디자인 (첨부 이미지 스타일) */
-        .input-wrapper {
-            position: relative;
+        /* 입력창과 안내문구를 감싸는 컨테이너 (가로 배치) */
+        .input-row-container {
+            display: flex;
+            align-items: center; /* 수직 중앙 정렬 */
+            justify-content: center;
             width: 100%;
+            max-width: 600px; /* 전체 너비 제한 */
+            gap: 20px; /* 안내문구와 입력창 사이 간격 */
+        }
+
+        /* 입력창 래퍼 */
+        .input-wrapper {
+            flex: 1; /* 남은 공간 차지 */
             max-width: 500px;
         }
 
@@ -152,41 +164,34 @@
             resize: none;
             outline: none;
             background-color: #fff;
-            /* 커서 중앙 정렬 (시작 시) - 입력 시작하면 상단으로 가도록 JS 제어 가능하나, 
-               일반적인 메모 습관상 상단 정렬이 자연스러우므로 padding으로 조절하거나 
-               flex를 사용. 이미지처럼 정중앙 커서를 원하면 아래 속성 사용 */
             display: flex;
             align-items: center;
             justify-content: center; 
         }
         
-        /* 텍스트가 입력되면 정렬을 위로 변경하기 위한 클래스 */
-        textarea#new-memo.typing {
-            display: block;
+        /* Shift+Tab 안내 박스 */
+        .shortcut-guide-box {
+            flex-shrink: 0; /* 크기 줄어들지 않음 */
         }
 
-        /* Shift+Tab 안내 */
         .shortcut-guide {
-            position: absolute;
-            left: -80px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 60px;
+            width: 70px;
             border: 1px solid var(--line-color);
-            padding: 10px;
+            padding: 15px 5px;
             text-align: center;
             font-size: 14px;
             background: #f9f9f9;
             box-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+            line-height: 1.4;
         }
 
         .shortcut-guide strong {
             display: block;
-            margin-bottom: 5px;
             font-size: 16px;
+            margin-bottom: 2px;
         }
 
-        /* 색상 선택기 (포스트잇 느낌) */
+        /* 색상 선택기 */
         .color-picker {
             display: flex;
             gap: 10px;
@@ -194,7 +199,26 @@
             justify-content: flex-end;
             width: 100%;
             max-width: 500px;
+            /* 입력창 너비에 맞추기 위해 우측 정렬 보정 */
+            margin-left: auto;
+            margin-right: 0;
         }
+
+        /* .input-row-container 내부의 입력창 너비와 맞추기 위한 보조 컨테이너 */
+        .color-picker-container {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .color-picker-wrapper {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
 
         .color-option {
             width: 20px;
@@ -211,16 +235,21 @@
         }
 
         /* 모바일 대응 */
-        @media (max-width: 700px) {
-            .shortcut-guide {
-                position: static;
-                transform: none;
-                margin-bottom: 10px;
-                width: auto;
-                display: inline-block;
+        @media (max-width: 600px) {
+            .input-row-container {
+                gap: 10px; /* 간격 좁힘 */
             }
-            #input-area {
-                padding: 0 20px;
+            .shortcut-guide {
+                width: 50px; /* 안내문구 너비 줄임 */
+                padding: 10px 2px;
+                font-size: 12px;
+            }
+            .shortcut-guide strong {
+                font-size: 14px;
+            }
+            header {
+                padding: 10px;
+                gap: 10px;
             }
         }
     </style>
@@ -255,36 +284,43 @@
         <div id="input-area">
             <div id="input-connector" class="connector" style="display: none;"></div>
 
-            <div class="shortcut-guide">
-                <strong>Shft</strong>
-                <strong>+</strong>
-                <strong>tab</strong>
-                으로<br>등록
+            <div class="input-row-container">
+                <div class="shortcut-guide-box">
+                    <div class="shortcut-guide">
+                        <strong>Shft</strong>
+                        <strong>+</strong>
+                        <strong>tab</strong>
+                        으로<br>등록
+                    </div>
+                </div>
+
+                <div class="input-wrapper">
+                    <textarea id="new-memo" placeholder="생각을 지금 바로 입력해주세요."></textarea>
+                </div>
             </div>
 
-            <div class="input-wrapper">
-                <textarea id="new-memo" placeholder="생각을 지금 바로 입력해주세요."></textarea>
-            </div>
-
-            <div class="color-picker">
-                <div class="color-option selected" style="background-color: var(--color-white);" data-color="white"></div>
-                <div class="color-option" style="background-color: var(--color-yellow);" data-color="yellow"></div>
-                <div class="color-option" style="background-color: var(--color-blue);" data-color="blue"></div>
-                <div class="color-option" style="background-color: var(--color-pink);" data-color="pink"></div>
-                <div class="color-option" style="background-color: var(--color-green);" data-color="green"></div>
+            <div class="color-picker-container">
+                <div class="color-picker-wrapper">
+                    <div class="color-picker">
+                        <div class="color-option selected" style="background-color: var(--color-white);" data-color="white"></div>
+                        <div class="color-option" style="background-color: var(--color-yellow);" data-color="yellow"></div>
+                        <div class="color-option" style="background-color: var(--color-blue);" data-color="blue"></div>
+                        <div class="color-option" style="background-color: var(--color-pink);" data-color="pink"></div>
+                        <div class="color-option" style="background-color: var(--color-green);" data-color="green"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // 데이터 저장소 (휘발성)
+        // 데이터 저장소
         let memos = [];
         let selectedColor = 'white';
 
         const dom = {
             container: document.getElementById('app-container'),
             memoList: document.getElementById('memo-list'),
-            inputArea: document.getElementById('input-area'),
             textarea: document.getElementById('new-memo'),
             connector: document.getElementById('input-connector'),
             colorOptions: document.querySelectorAll('.color-option'),
@@ -300,24 +336,13 @@
 
         // 이벤트 리스너 설정
         function setupEventListeners() {
-            // Shift + Tab 등록
+            // Shift + Tab 등록 (한글 중복 입력 방지 적용)
             dom.textarea.addEventListener('keydown', (e) => {
+                if (e.isComposing) return; 
 
-                if (e.isComposing) return;
-
-                
                 if (e.key === 'Tab' && e.shiftKey) {
-                    e.preventDefault(); // 기본 탭 이동 방지
+                    e.preventDefault();
                     addMemo();
-                }
-            });
-
-            // 입력 시 스타일 변경 (중앙 정렬 해제 등)
-            dom.textarea.addEventListener('input', () => {
-                if (dom.textarea.value.trim() !== '') {
-                    // 내용이 있으면 일반 텍스트 모드 (위쪽 정렬 느낌)
-                    // 현재 CSS Flex로 중앙정렬 중이므로, 내용이 길어지면 자연스럽게 찰 것임.
-                    // 필요 시 클래스 추가 가능
                 }
             });
 
@@ -328,7 +353,6 @@
                     opt.classList.add('selected');
                     selectedColor = opt.getAttribute('data-color');
                     
-                    // 입력창 배경색도 살짝 바꿔주어 현재 선택된 색 인지 (선택 사항)
                     const colorMap = {
                         'white': '#ffffff',
                         'yellow': '#fff740',
@@ -360,23 +384,19 @@
 
             memos.push(newMemo);
             
-            // 입력창 초기화
             dom.textarea.value = '';
-            dom.textarea.focus(); // 바로 다시 포커스
+            dom.textarea.focus();
 
-            // 화면 상태 업데이트 (첫 메모 등록 시 레이아웃 변경)
             if (memos.length > 0) {
                 dom.container.classList.remove('empty');
                 dom.connector.style.display = 'block';
             }
 
             renderMemos();
-            
-            // 스크롤을 맨 아래로 이동
             window.scrollTo(0, document.body.scrollHeight);
         }
 
-        // 날짜 포맷 (YYYY-MM-DD HH:MM:SS)
+        // 날짜 포맷
         function formatDate(date) {
             const yyyy = date.getFullYear();
             const mm = String(date.getMonth() + 1).padStart(2, '0');
@@ -395,29 +415,24 @@
             const colorFilter = dom.filterColor.value;
 
             const filteredMemos = memos.filter(memo => {
-                // 색상 필터
                 if (colorFilter !== 'all' && memo.color !== colorFilter) return false;
-
-                // 날짜 필터
                 if (dateFilter !== 'all') {
                     const now = new Date();
                     const diffTime = Math.abs(now - memo.date);
                     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-
                     if (dateFilter === 'week' && diffDays > 7) return false;
                     if (dateFilter === 'month' && diffDays > 30) return false;
                 }
                 return true;
             });
 
-            filteredMemos.forEach((memo, index) => {
+            filteredMemos.forEach((memo) => {
                 const el = document.createElement('div');
                 el.style.width = '100%';
                 el.style.display = 'flex';
                 el.style.flexDirection = 'column';
                 el.style.alignItems = 'center';
 
-                // 색상 맵핑
                 const colorMap = {
                     'white': 'var(--color-white)',
                     'yellow': 'var(--color-yellow)',
@@ -438,7 +453,6 @@
             });
         }
 
-        // 실행
         init();
     </script>
 </body>
