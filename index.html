@@ -46,7 +46,7 @@
             background: rgba(255, 255, 255, 0.95);
             border-bottom: 1px solid #eee;
             display: flex;
-            justify-content: space-between; /* 양쪽 정렬 */
+            justify-content: space-between;
             align-items: center;
             z-index: 1000;
             font-size: 14px;
@@ -70,10 +70,11 @@
             cursor: pointer;
         }
 
-        /* 사용자 아이콘 및 영역 */
+        /* 사용자 아이콘 */
         .user-area {
             position: relative;
             cursor: pointer;
+            z-index: 1002; /* 화살표보다 위에 */
         }
 
         .user-icon {
@@ -87,7 +88,6 @@
             background: #fff;
         }
         
-        /* 투박한 선 아이콘 (SVG) */
         .user-icon svg {
             width: 16px;
             height: 16px;
@@ -96,46 +96,55 @@
             stroke-width: 1.5;
         }
 
-        /* 회원가입 유도 화살표 및 텍스트 */
+        /* [수정됨] 회원가입 유도 화살표 및 텍스트 */
         #signup-nudge {
             display: none; /* 기본 숨김 */
             position: fixed;
             top: 50px; /* 헤더 바로 아래 */
-            right: 25px;
-            flex-direction: column;
-            align-items: flex-end;
+            right: 28px; /* 아이콘 위치와 중앙 정렬되도록 조정 */
+            flex-direction: column; /* 세로 배치 (화살표 위, 텍스트 아래) */
+            align-items: center;    /* 중앙 정렬 */
             z-index: 1001;
-            pointer-events: none; /* 클릭 방해 안 함 */
+            pointer-events: none;
         }
 
+        /* [수정됨] 화살표 몸통 (세로 선) */
         .nudge-arrow {
-            width: 20px;
+            width: 1px; 
             height: 30px;
-            border-right: 1px solid var(--line-color); /* 화살표 몸통 */
+            background-color: var(--line-color); /* 몸통 색상 */
             position: relative;
-            margin-right: 12px; /* 아이콘 중앙 정렬 보정 */
+            margin-bottom: 5px; /* 텍스트와의 간격 */
         }
         
+        /* [수정됨] 화살표 머리 (정밀 정렬) */
         .nudge-arrow::before {
             content: '';
             position: absolute;
-            top: -1px;
-            right: -1px;
-            width: 8px;
-            height: 8px;
+            top: 0;
+            left: 50%; /* 선의 중앙 */
+            width: 6px;
+            height: 6px;
             border-top: 1px solid var(--line-color);
-            border-right: 1px solid var(--line-color);
-            transform: rotate(-45deg); /* 화살표 머리 */
+            border-left: 1px solid var(--line-color);
+            /* 중앙 정렬 보정(-50%) 및 45도 회전 */
+            transform: translateX(-50%) rotate(45deg); 
+            background: transparent;
         }
 
+        /* [수정됨] 텍스트 박스 (세로 쓰기, 폰트 수정) */
         .nudge-text {
-            margin-top: 5px;
-            font-size: 14px;
-            font-weight: bold;
-            color: #ff0000; /* 강조 */
+            font-size: 13px;
+            font-weight: normal; /* 굵음 해제 */
+            color: #000; /* 검정색 */
             background: #fff;
-            padding: 2px 5px;
+            padding: 10px 4px;
             border: 1px solid var(--line-color);
+            
+            /* 세로 쓰기 설정 */
+            writing-mode: vertical-rl; 
+            text-orientation: upright; /* 글자 똑바로 세우기 */
+            letter-spacing: 2px; /* 자간 조정 */
         }
 
         /* 메인 컨테이너 */
@@ -299,9 +308,7 @@
             border-color: #000;
         }
 
-        /* ------------------------
-           로그인/회원가입 모달 (심플 & 투박)
-           ------------------------ */
+        /* 로그인/회원가입 모달 */
         #auth-modal {
             display: none;
             position: fixed;
@@ -349,12 +356,6 @@
             cursor: pointer;
             font-family: var(--font-main);
             margin-top: 10px;
-        }
-        
-        .auth-btn.secondary {
-            background: #fff;
-            color: #000;
-            border: 1px solid #000;
         }
 
         .auth-toggle {
@@ -463,10 +464,10 @@
 
     <script>
         // ---------------------------------------------
-        // [1] Firebase 설정 (여기에 본인의 설정값을 붙여넣으세요)
+        // [1] Firebase 설정 (본인의 키 값으로 변경 필수)
         // ---------------------------------------------
         const firebaseConfig = {
-            apiKey: "AIzaSyAHEw441NtoPznQ5ix4gv81uw-nCq_Bkps",
+             apiKey: "AIzaSyAHEw441NtoPznQ5ix4gv81uw-nCq_Bkps",
             authDomain: "simple-memo-7acb3.firebaseapp.com",
             projectId: "simple-memo-7acb3",
             storageBucket: "simple-memo-7acb3.firebasestorage.app",
@@ -481,16 +482,14 @@
             auth = firebase.auth();
             db = firebase.firestore();
         } catch (e) {
-            console.error("Firebase 설정이 올바르지 않습니다. 키 값을 확인해주세요.", e);
+            console.error("Firebase 설정 확인 필요", e);
         }
 
-        // ---------------------------------------------
-        // [2] 상태 관리
-        // ---------------------------------------------
-        let memos = []; // 로컬 혹은 DB 데이터
+        // 상태 변수
+        let memos = [];
         let selectedColor = 'white';
-        let currentUser = null; // 로그인 사용자 정보
-        let isSignupMode = false; // 로그인창인지 회원가입창인지 구분
+        let currentUser = null;
+        let isSignupMode = false;
 
         const dom = {
             container: document.getElementById('app-container'),
@@ -500,8 +499,6 @@
             colorOptions: document.querySelectorAll('.color-option'),
             filterDate: document.getElementById('filter-date'),
             filterColor: document.getElementById('filter-color'),
-            
-            // UI 추가 요소
             userBtn: document.getElementById('user-icon-btn'),
             nudge: document.getElementById('signup-nudge'),
             modal: document.getElementById('auth-modal'),
@@ -516,14 +513,10 @@
         function init() {
             dom.textarea.focus();
             setupEventListeners();
-            checkAuthState(); // 로그인 상태 확인
+            checkAuthState();
         }
 
-        // ---------------------------------------------
-        // [3] 이벤트 리스너
-        // ---------------------------------------------
         function setupEventListeners() {
-            // 메모 등록
             dom.textarea.addEventListener('keydown', (e) => {
                 if (e.isComposing) return;
                 if (e.key === 'Tab' && e.shiftKey) {
@@ -532,7 +525,6 @@
                 }
             });
 
-            // 색상 선택
             dom.colorOptions.forEach(opt => {
                 opt.addEventListener('click', () => {
                     dom.colorOptions.forEach(o => o.classList.remove('selected'));
@@ -543,44 +535,30 @@
                 });
             });
 
-            // 필터
             dom.filterDate.addEventListener('change', renderMemos);
             dom.filterColor.addEventListener('change', renderMemos);
 
-            // 사용자 아이콘 클릭 -> 모달 열기
             dom.userBtn.addEventListener('click', () => {
                 if (currentUser) {
-                    if(confirm("로그아웃 하시겠습니까?")) {
-                        auth.signOut();
-                    }
+                    if(confirm("로그아웃 하시겠습니까?")) auth.signOut();
                 } else {
                     openModal();
                 }
             });
 
-            // 모달 관련
             dom.toggleBtn.addEventListener('click', toggleAuthMode);
             dom.closeModalBtn.addEventListener('click', closeModal);
             dom.actionBtn.addEventListener('click', handleAuthAction);
         }
-
-        // ---------------------------------------------
-        // [4] 로그인 / 회원가입 / DB 로직
-        // ---------------------------------------------
         
-        // 로그인 상태 감지
         function checkAuthState() {
             if (!auth) return;
             auth.onAuthStateChanged((user) => {
                 currentUser = user;
                 if (user) {
-                    // 로그인 됨: DB에서 불러오기
-                    console.log("로그인 됨:", user.email);
-                    dom.nudge.style.display = 'none'; // 유도 화살표 끄기
+                    dom.nudge.style.display = 'none';
                     loadMemosFromDB();
                 } else {
-                    // 로그아웃 됨: 로컬 초기화 (휘발성)
-                    console.log("로그아웃 됨");
                     memos = []; 
                     renderMemos();
                     dom.container.classList.add('empty');
@@ -589,21 +567,19 @@
             });
         }
 
-        // DB에 저장
         function saveMemoToDB(memo) {
             if (!currentUser || !db) return;
             db.collection('users').doc(currentUser.uid).collection('memos').add({
                 content: memo.content,
                 color: memo.color,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp() // 서버 시간
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
         }
 
-        // DB에서 불러오기 (실시간 동기화)
         function loadMemosFromDB() {
             if (!currentUser || !db) return;
             db.collection('users').doc(currentUser.uid).collection('memos')
-                .orderBy('createdAt', 'desc') // 최신순
+                .orderBy('createdAt', 'desc')
                 .onSnapshot((snapshot) => {
                     memos = snapshot.docs.map(doc => {
                         const data = doc.data();
@@ -615,7 +591,6 @@
                         };
                     });
                     
-                    // 화면 갱신
                     if (memos.length > 0) {
                         dom.container.classList.remove('empty');
                         dom.connector.style.display = 'block';
@@ -627,32 +602,25 @@
                 });
         }
 
-        // 로그인/가입 처리
         function handleAuthAction() {
             const email = dom.emailInput.value;
             const pw = dom.pwInput.value;
-            
             if (!email || !pw) return alert("이메일과 비밀번호를 입력해주세요.");
 
             if (isSignupMode) {
-                // 회원가입
                 auth.createUserWithEmailAndPassword(email, pw)
-                    .then((cred) => {
-                        alert("회원가입 성공! 이제 메모가 저장됩니다.");
+                    .then(() => {
+                        alert("회원가입 성공!");
                         closeModal();
                     })
                     .catch((error) => alert("가입 실패: " + error.message));
             } else {
-                // 로그인
                 auth.signInWithEmailAndPassword(email, pw)
-                    .then((cred) => {
-                        closeModal();
-                    })
-                    .catch((error) => alert("로그인 실패: 이메일이나 비밀번호를 확인하세요."));
+                    .then(() => closeModal())
+                    .catch((error) => alert("로그인 실패: 정보를 확인하세요."));
             }
         }
 
-        // 모달 UI 제어
         function openModal() {
             dom.modal.style.display = 'flex';
             isSignupMode = false;
@@ -679,14 +647,10 @@
             }
         }
 
-        // ---------------------------------------------
-        // [5] 핵심 메모 로직 (수정됨)
-        // ---------------------------------------------
         function addMemo() {
             const content = dom.textarea.value.trim();
             if (!content) return;
 
-            // 1. 로그인 상태면 -> DB에 저장 (화면 갱신은 onSnapshot이 함)
             if (currentUser) {
                 saveMemoToDB({ content: content, color: selectedColor });
                 dom.textarea.value = '';
@@ -694,7 +658,6 @@
                 return; 
             }
 
-            // 2. 비로그인 상태면 -> 로컬 배열에 저장 (휘발성)
             const now = new Date();
             const newMemo = {
                 id: Date.now(),
@@ -703,11 +666,7 @@
                 color: selectedColor
             };
             
-            // 최신순이 아래로 가도록 push (요청사항 반영) -> *수정: 기존 요청은 '오래된 것이 위, 최신이 아래'였으나
-            // 보통 메모앱은 최신이 위입니다. 하지만 요청하신대로 '오래된 것이 위, 최신이 아래'라면 push가 맞습니다.
-            // 다만 DB 정렬은 보통 최신이 위가 편하므로 DB는 desc로 했지만, 로컬은 아래로 쌓겠습니다.
             memos.push(newMemo); 
-
             dom.textarea.value = '';
             dom.textarea.focus();
 
@@ -719,14 +678,10 @@
             renderMemos();
             window.scrollTo(0, document.body.scrollHeight);
 
-            // *** 3번째 메모 작성 시 회원가입 유도 ***
+            // 3번째 메모 시 유도
             if (memos.length >= 3) {
-                showSignupNudge();
+                dom.nudge.style.display = 'flex';
             }
-        }
-
-        function showSignupNudge() {
-            dom.nudge.style.display = 'flex';
         }
 
         function formatDate(date) {
@@ -745,12 +700,10 @@
             const dateFilter = dom.filterDate.value;
             const colorFilter = dom.filterColor.value;
 
-            // DB에서 가져온 데이터(desc 정렬)일 경우 화면 표시는 시간순(asc)으로 바꾸고 싶다면 reverse() 필요
-            // 요청사항: "오래된 것이 위, 최신이 아래" -> 즉 시간 오름차순(Ascending)
-            // 로컬 데이터는 push했으므로 오름차순임. DB데이터는 desc로 가져왔으니 reverse해서 렌더링.
+            // 로컬은 쌓이는 순서(push), DB는 불러와서 역순(reverse)
             let displayMemos = [...memos];
             if(currentUser) {
-                displayMemos.reverse(); // DB 최신순 -> 화면상 아래에 배치되도록 역정렬
+                displayMemos.reverse(); 
             }
 
             const filteredMemos = displayMemos.filter(memo => {
